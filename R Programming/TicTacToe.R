@@ -1,4 +1,4 @@
-# TicTacToe.R
+# TicTacToe.R 
 #
 # Creation date:
 #   2021-04-12
@@ -7,7 +7,7 @@
 #   Herbert Barrientos (hpbarr@gmail.com)
 #
 # Version:
-#   1.0
+#   1.1
 #
 # Description:
 #   Implements the tic-tac-toe game, whereby the computer
@@ -2032,7 +2032,7 @@ winGame <- function(symbol) {
 #   TRUE : the computer player blocked a win move
 #
 # Precondition:
-#  ((symbol == X) || (symbol == O))
+#   ((symbol == X) || (symbol == O))
 #
 # Postcondition:
 #   (return value == TRUE) --> global variables have
@@ -2083,8 +2083,14 @@ block <- function(symbol) {
 #   The computer player, represented by argument symbol,
 #   creates a threat for the human opponent.
 #
+#   To check if there exists a threat for the computer player
+#   (i.e, ME), argument symbol should be set to the character
+#   assigned to player THEY, and argument forME should be set
+#   with the character assigned to ME.
+#
 # Arguments:
 #   symbol: character
+#   forME : character - default: NULL
 #
 # Returns:
 #   NULL : the precondition does not hold
@@ -2092,15 +2098,16 @@ block <- function(symbol) {
 #   TRUE : the computer player created a threat
 #
 # Precondition:
-#  ((symbol == X) || (symbol == O))
+#   (((symbol == X) || (symbol == O)) &&
+#    ((forME != NULL) --> ((forME  == X) || (forME  == O))))
 #
 # Postcondition:
 #   (return value == TRUE) --> global variables have
 #   been updated
 #
-createThreat <- function(symbol) {
+createThreat <- function(symbol, forME = NULL) {
 
-  if (!isSymbolValid(symbol))
+  if (!isSymbolValid(symbol) || (!is.null(forME) && !isSymbolValid(forME)))
     return(NULL)
 
   threats <- data.table(pos=as.integer(), freq=as.integer())
@@ -2166,7 +2173,11 @@ createThreat <- function(symbol) {
   if (nrow(threats) > 0) {
 
     maxThreat <- threats[which.max(threats$freq),]
-    setGameBoardPosValue(maxThreat$pos, symbol)
+
+    # if ME is creating the threat, set the next play with argument symbol.
+    # if the threat is for ME, set the next play with argument forME
+    setGameBoardPosValue(maxThreat$pos, ifelse(is.null(forME), symbol, forME))
+
     createdThreat <- TRUE
 
   }  # END if
@@ -2293,8 +2304,14 @@ playGame <- function() {
 
         if (!block(meSymbol)) {
 
-          if (!createThreat(meSymbol))
-            playAnywhere(meSymbol)
+          # if a threat could be created for ME, block it.
+          # otherwise, create a threat for THEY. If that
+          # does not work, play anywhere
+          if (!createThreat(theySymbol, forME = meSymbol)) {
+
+            if (!createThreat(meSymbol)) playAnywhere(meSymbol)
+
+          }  # END if
 
         }  # END if
 

@@ -18,7 +18,7 @@ Strategy:
 
   + *winGame*: ME's next move results in a win.  
   + *block*: ME blocks a threat from THEY.  
-  + *createThreat*: ME's next move creates a simple threat or a fork.
+  + *createThreat*: ME's next move creates a simple threat or a fork. This strategy is also used to find out if THEY has posed a threat to ME.
   + *playAnywhere*: when all strategies have failed, ME plays the next move by choosing a cell position at random.  
 
 ### Working Environment
