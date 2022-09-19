@@ -1,0 +1,384 @@
+---
+title: "__R for Data Science Task__"   
+author: "Prepared by Herbert Barrientos"
+date: "18 September, 2022"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+## Summary
+The purpose of this task is to apply tidyverse functionality to a partiular dataset. By using tidyverse, the resulting R code will:   
+
+* have less clutter (e.g., no need to create an excessive number of variables) and is therefore easier to read   
+* make more efficient use of R's data processing capabilities   
+* facilitate code maintenance and extension   
+
+The exercises presented herein were applied to the *gapminder_clean.csv* dataset, downloadable from this task's repository. 
+
+## Objectives
+1. Use tidyverse functions to analyze the *gapminder_clean dataset* by following a set of instructions   
+2. Use tidyverse and further Data Science skills to respond to specific questions   
+
+## Data Cookbook
+**TABLE**  : gapminder_clean.csv   
+
+|COLUMN|TYPE|DATA EXAMPLES|  
+|------|----|-------------|  
+|country.name                                       |chr|"Afghanistan" "Albania" "Algeria" "American Samoa" "Andorra"|  
+|year                                               |int|1962 1967 1972 1977 1982 1987 1992 1997 2002 2007|  
+|agriculture.value.added.of.gdp                     |num|38.47194 30.62285 31.69971 33.20002 51.64187 32.70016|  
+|co2.emissions.metric.tons.per.capita               |num|0.0738 0.1238 0.1308 0.1831 0.1659|  
+|domestic.credit.provided.by.financial.sector.of.gdp|num|21.28 9.92 18.88 13.84|  
+|electric.power.consumption.kWh.per.capita          |num|568.4032 1067.8142 1096.8732 1161.9517  442.2491  680.6889|  
+|energy.use.kg.of.oil.equivalent.per.capita         |num|865.5925 923.7289 966.6833 921.8930 418.2866 384.5950|  
+|exports.of.goods.and.services.of.gdp               |num|4.88 6.77 14.76 11.66|  
+|fertility.rate.total.births.per.woman              |num|7.45 7.45 7.45 7.45 7.45|  
+|gdp.growth.annual                                  |num|13.7402050 2.9485968 -0.7878426 -7.2000000 -10.8378557|  
+|imports.of.goods.and.services.of.gdp               |num|9.35 14.21 18.11 14.82|  
+|industry.value.added.of.gdp                        |num|23.71410 27.34470 43.80017 45.80015 23.32056 15.37765|  
+|inflation.gdp.deflator.annual                      |num|2.238202e+01 -1.769429e-02 2.861763e-05 2.496834e+02|  
+|life.expectancy.at.birth.total.years               |num|33.2 35.4 37.6 40.1 43.2|  
+|population.density.people.per.sq.km.of.land.area   |num|14.3 15.9 17.9 20 19.4|  
+|services.etc.value.added.of.gdp                    |num|37.81396 42.03244 24.50012 20.99982 25.03757 51.92219|  
+|pop [population]                                   |num|10267083 11537966 13079460 14880372 12881816|  
+|continent                                          |chr|"Asia" "Europe" "Africa" Americas" "Oceania"|  
+|gdpPercap [GDP per capita]                         |num|853 836 740 786 978|  
+
+## Data Processing
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+### Part 1: Use tidyverse functions to analyze the _gapminder_clean_ dataset   
+Step 1.1. Load libraries and define constants used throughout the process
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+# ######### CONSTANTS #########
+FILE_PATH <- 
+  "D:/DE/projects/R/wd/Bioinformatics/Bioinformatics Research Network/02 R for Data Science/gapminder_clean.csv"
+
+# Plot titles
+CO2_EMISSIONS <- "CO2 Emissions (Metric Tons per Capita)"
+CONTINENT <- "Continent"
+COUNTRY   <- "Country"
+ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA <- "Energy Use - KG of Oil Equivalent per Capita"
+GDP_PER_CAPITA <- "GDP per Capita"
+CO2_EMMISIONS_METRIC_TONS_PER_CAPITA <- "CO2 Emmisions - Metric Tons per Capita"
+IMPORTS_GOODS_SERVICES_GDP <- "Imports of Goods and Services of GDP"
+INCREASE_LIFE_EXPECTANCY   <- "Increase in Life Expectancy"
+POPULATION_DENSITY_PEOPLE_KM2 <- "Population Density (People/KM2)"
+YEAR <- "Year"
+```
+<BR>
+Step 1.2. Read the data file and clean up its columns:   
+
+* Remove the X column (row numbers)
+* Make the rest of the column names more readable
+```{r}
+gapminder_clean <- read.csv(FILE_PATH)
+
+gapminder_clean$X <- NULL
+
+gapminder_clean <- gapminder_clean %>%
+  rename(
+    country.name = Country.Name,
+    year = Year,
+    agriculture.value.added.of.gdp = Agriculture..value.added....of.GDP.,
+    co2.emissions.metric.tons.per.capita = CO2.emissions..metric.tons.per.capita.,
+    domestic.credit.provided.by.financial.sector.of.gdp = 
+      Domestic.credit.provided.by.financial.sector....of.GDP.,
+    electric.power.consumption.kWh.per.capita = Electric.power.consumption..kWh.per.capita.,
+    energy.use.kg.of.oil.equivalent.per.capita = Energy.use..kg.of.oil.equivalent.per.capita.,
+    exports.of.goods.and.services.of.gdp = Exports.of.goods.and.services....of.GDP.,
+    fertility.rate.total.births.per.woman = Fertility.rate..total..births.per.woman.,
+    gdp.growth.annual = GDP.growth..annual...,
+    imports.of.goods.and.services.of.gdp = Imports.of.goods.and.services....of.GDP.,
+    industry.value.added.of.gdp = Industry..value.added....of.GDP.,
+    inflation.gdp.deflator.annual = Inflation..GDP.deflator..annual...,
+    life.expectancy.at.birth.total.years = Life.expectancy.at.birth..total..years.,
+    population.density.people.per.sq.km.of.land.area = Population.density..people.per.sq..km.of.land.area.,
+    services.etc.value.added.of.gdp = Services..etc...value.added....of.GDP.
+  )
+```
+<BR>
+Step 1.3. Filter the data to include only rows where Year is 1962. Remove rows containing NAs   
+```{r}
+gapminder_1962 <- gapminder_clean %>%
+  filter((year == 1962))
+
+gapminder_1962_complete_cases <- gapminder_1962 %>%
+  filter(!(is.na(co2.emissions.metric.tons.per.capita) | is.na(gdpPercap)))
+```
+<BR>
+Step 1.4. Make a scatter plot comparing 'CO2 emissions (metric tons per capita)' and gdpPercap for the filtered data. The resulting plot shows an outlier that could skew the results
+```{r}
+ggplotly(
+  ggplot(
+  gapminder_1962_complete_cases,
+  aes(
+    x = gdpPercap,
+    y = co2.emissions.metric.tons.per.capita
+  )
+) +
+  geom_point() +
+  scale_x_log10() +
+  labs(
+    x = GDP_PER_CAPITA,
+    y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
+  ))
+```
+<BR>
+Step 1.5. Calculate the correlation of 'CO2 emissions (metric tons per capita)' and gdpPercap. Including the discovered outlier, the result shows a high degree of correlation: ~ 93%. Although the outlier tends to show an increasing linear pattern, there is a considerable distance between it and the rest of the data points. This gap makes it difficult to conclude that there is indeed an increasing linear pattern
+```{r}
+correlation_outlier <- cor.test(
+  gapminder_1962_complete_cases$co2.emissions.metric.tons.per.capita,
+  gapminder_1962_complete_cases$gdpPercap
+)
+
+correlation_outlier
+```
+<BR>
+Step 1.6. If the outlier is removed (as shown in the flowing plot), the correlation test always shows a high degree of correlation. However, the degree is much less and thus more realistic: ~ 81%
+```{r}
+gapminder_1962_complete_cases_no_outlier <- gapminder_1962 %>%
+  filter(!(is.na(co2.emissions.metric.tons.per.capita) | is.na(gdpPercap)) & (gdpPercap < 25000))
+
+ggplotly(
+  ggplot(
+  gapminder_1962_complete_cases_no_outlier,
+  aes(
+    x = gdpPercap,
+    y = co2.emissions.metric.tons.per.capita
+  )
+) +
+  geom_point() +
+  scale_x_log10() +
+  labs(
+    x = GDP_PER_CAPITA,
+    y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
+  ))
+
+correlation_no_outlier <- cor.test(
+  gapminder_1962_complete_cases_no_outlier$co2.emissions.metric.tons.per.capita,
+  gapminder_1962_complete_cases_no_outlier$gdpPercap
+)
+
+correlation_no_outlier
+```
+<BR>
+Step 1.7. On the unfiltered data, answer "In what year is the correlation between 'CO2 emissions (metric tons per capita)' and gdpPercap the strongest"?
+```{r}
+gapminder_clean_by_year <- gapminder_clean %>%
+  select(year, co2.emissions.metric.tons.per.capita, gdpPercap, pop, continent)
+
+gapminder_clean_by_year <- gapminder_clean_by_year[complete.cases(gapminder_clean_by_year), ]
+
+correlation_by_year <- gapminder_clean_by_year %>%
+  group_by(year) %>%
+  summarise(correlation = cor.test(co2.emissions.metric.tons.per.capita, gdpPercap)$estimate[[1]])
+
+strongest_correlation_by_year <- (correlation_by_year %>%
+  arrange(desc(correlation)))$year[1]
+
+strongest_correlation_by_year
+```
+<BR>
+Step 1.8. Filter the dataset to that year for the next step...
+```{r}
+gapminder_strongest_correlation <- gapminder_clean %>%
+  filter(year == strongest_correlation_by_year)
+```
+<BR>
+Step 1.9. Using plotly, create an interactive scatter plot comparing 'CO2 emissions (metric tons per capita)' and gdpPercap, where the point size is determined by pop (population) and the color is determined 
+# by the continent
+```{r}
+ggplotly(ggplot(
+  gapminder_strongest_correlation,
+  aes(
+    x = gdpPercap,
+    y = co2.emissions.metric.tons.per.capita,
+    color = continent,
+    size = pop
+  )
+) +
+  geom_point() +
+  scale_x_log10() +
+  labs(
+    x = GDP_PER_CAPITA,
+    y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
+  ))
+```
+
+### Part 2: Use tidyverse and further Data Science skills to respond to specific questions   
+Step 2.1. Question: What is the relationship between continent and 'Energy use (kg of oil equivalent per capita)'? (stats test needed)   
+Response: In this case, since the categorical variable 'continent' is not dichotomous, the Kruskal-Wallis test was used. Results:  
+
+* Distribution plot: shows that the relationship between variables is not linear
+* Box plot: medians are not the same among categories. There is a high degree of overlap between the boxes, suggesting that the variables are weakly correlated
+* Kruskal-Wallis: p-value = 0.4935 is greater than 0.05, meaning that there is not enough evidence to reject the fact that all medians are equal
+```{r}
+gapminder_clean_continent_energy <- gapminder_clean %>%
+  select(year, continent, energy.use.kg.of.oil.equivalent.per.capita) %>%
+  filter(continent != "")
+
+gapminder_clean_continent_energy <- 
+  gapminder_clean_continent_energy[complete.cases(gapminder_clean_continent_energy), ]
+
+gapminder_clean_continent_energy$continent <- as.factor(gapminder_clean_continent_energy$continent)
+```
+
+```{r}
+ggplotly(
+  ggplot(
+  gapminder_clean_continent_energy,
+  aes(
+    x = continent,
+    y = energy.use.kg.of.oil.equivalent.per.capita
+  )
+) +
+  geom_point() +
+  labs(
+    x = CONTINENT,
+    y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
+  ))
+```
+
+```{r}
+ggplotly(
+  ggplot(gapminder_clean_continent_energy) +
+  geom_boxplot(aes(
+    continent,
+    energy.use.kg.of.oil.equivalent.per.capita
+  )) +
+  labs(
+    x = CONTINENT,
+    y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
+  ))
+```
+
+```{r}
+levels(gapminder_clean_continent_energy$continent)
+kruskal.test(gapminder_clean_continent_energy$continent ~ 
+             gapminder_clean_continent_energy$energy.use.kg.of.oil.equivalent.per.capita)
+```
+<BR>
+Step 2.2. Question: Is there a significant difference between Europe and Asia with respect to 'Imports of goods and services (% of GDP)' in the years after 1990? (stats test needed)   
+Response: No, because although the medians are not equal, they are highly similar. In this case, the categorical variable 'continent' is dichotomous; therefore, the Wilcox test was chosen. Results:
+
+* Distribution plot: shows that the relationship between variables is not linear
+* Box plot: medians are not the same among categories. There is a high degree of overlap between the boxes, suggesting that the variables are weakly correlated
+* Willcox: p-value = 0.7867 is greater than 0.05, meaning that there is not enough evidence to reject the fact that all medians are equal
+```{r}
+gapminder_clean_europe_asia_1990 <- gapminder_clean %>%
+  select(year, continent, imports.of.goods.and.services.of.gdp) %>%
+  filter((year >= 1990) & ((continent == "Europe") | (continent == "Asia")))
+
+gapminder_clean_europe_asia_1990 <- 
+  gapminder_clean_europe_asia_1990[complete.cases((gapminder_clean_europe_asia_1990)), ]
+```
+
+```{r}
+ggplotly(
+  ggplot(
+  gapminder_clean_europe_asia_1990,
+  aes(
+    x = continent,
+    y = imports.of.goods.and.services.of.gdp
+  )
+) +
+  geom_point() +
+  labs(
+    x = CONTINENT,
+    y = IMPORTS_GOODS_SERVICES_GDP
+  ))
+```
+
+```{r}
+ggplotly(
+  ggplot(gapminder_clean_europe_asia_1990) +
+  geom_boxplot(aes(
+    continent,
+    imports.of.goods.and.services.of.gdp
+  )) +
+  labs(
+    x = CONTINENT,
+    y = IMPORTS_GOODS_SERVICES_GDP
+  ))
+```
+
+```{r}
+gapminder_clean_europe_asia_1990$continent <- as.factor(gapminder_clean_europe_asia_1990$continent)
+levels(gapminder_clean_europe_asia_1990$continent)
+
+wilcox.test(
+  gapminder_clean_europe_asia_1990$imports.of.goods.and.services.of.gdp[
+    which(gapminder_clean_europe_asia_1990$continent == "Asia")],
+  gapminder_clean_europe_asia_1990$imports.of.goods.and.services.of.gdp[
+    which(gapminder_clean_europe_asia_1990$continent == "Europe")]
+)
+```
+<BR>
+Step 2.3. Question: What is the country (or countries) that has the highest 'Population density (people per sq. km of land area)' across all years? (i.e., which country has the highest average ranking in this category across each time point in the dataset?)   
+Response: Macao SAR (China) and Monaco
+```{r}
+highest_pop_density <- gapminder_clean %>%
+  select(year, country.name, population.density.people.per.sq.km.of.land.area)
+
+highest_pop_density <- highest_pop_density[complete.cases(highest_pop_density), ]
+highest_pop_density <- highest_pop_density %>%
+  group_by(year, country.name) %>%
+  summarise(pop_density = population.density.people.per.sq.km.of.land.area) %>%
+  arrange(year, desc(pop_density)) %>%
+  top_n(1, pop_density)
+```
+
+```{r}
+ggplotly(ggplot(
+  highest_pop_density,
+  aes(
+    x = year,
+    y = pop_density,
+    color = country.name
+  )
+) +
+  labs(
+    x = YEAR,
+    y = POPULATION_DENSITY_PEOPLE_KM2,
+    colour = COUNTRY
+  ) +
+  geom_line() +
+  geom_point(aes(year)))
+```
+<BR>
+Step 2.4. Question: What country (or countries) has shown the greatest increase in 'Life expectancy at birth, total (years)' since 1962?   
+Response: Iceland, Japan, and Sweden
+```{r}
+increase_life_expectancy <- gapminder_clean %>%
+  select(year, country.name, life.expectancy.at.birth.total.years)
+
+increase_life_expectancy <- increase_life_expectancy[complete.cases(increase_life_expectancy), ]
+increase_life_expectancy <- increase_life_expectancy %>%
+  filter(year >= 1962) %>%
+  group_by(year, country.name) %>%
+  summarise(life_expectancy = life.expectancy.at.birth.total.years) %>%
+  arrange(year, desc(life_expectancy)) %>%
+  top_n(1, life_expectancy)
+```
+
+```{r}
+ggplotly(ggplot(increase_life_expectancy, aes(x = year, y = life_expectancy, color = country.name)) +
+  labs(
+    x = YEAR,
+    y = INCREASE_LIFE_EXPECTANCY,
+    colour = COUNTRY
+  ) +
+  geom_line() +
+  geom_point(aes(year)))
+```
