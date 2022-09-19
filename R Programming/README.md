@@ -1,6 +1,6 @@
 # R programming
 
-This training is intended to help you gain and demonstrate fundamental skills in `R` programming 
+This training is intended to help you gain and demonstrate fundamental skills in `R` programming. `R` is an open-source language originally designed for statistical computing and it is an excellent language for data science and bioinformatics.
 
 ## Background and Getting Help
 
@@ -24,7 +24,7 @@ Create a script that lets you play a full game of tic-tac-toe, given that:
 
 **Hint**: To get user input on the command line, use the following construct:
 
-```
+```R
 if (interactive()) {
   con <- stdin()
 } else {
