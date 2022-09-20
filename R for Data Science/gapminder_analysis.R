@@ -1,6 +1,6 @@
-# #############################   
-# ######### LIBRARIES #########   
-# #############################   
+# #############################
+# ######### LIBRARIES #########
+# #############################
 library(dplyr)
 library(ggplot2)
 library(plotly)
@@ -14,12 +14,12 @@ FILE_PATH <- paste0(getwd(), "/gapminder_clean.csv")
 # Plot titles
 CO2_EMISSIONS <- "CO2 Emissions (Metric Tons per Capita)"
 CONTINENT <- "Continent"
-COUNTRY   <- "Country"
+COUNTRY <- "Country"
 ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA <- "Energy Use - KG of Oil Equivalent per Capita"
 GDP_PER_CAPITA <- "GDP per Capita"
 CO2_EMMISIONS_METRIC_TONS_PER_CAPITA <- "CO2 Emmisions - Metric Tons per Capita"
 IMPORTS_GOODS_SERVICES_GDP <- "Imports of Goods and Services of GDP"
-INCREASE_LIFE_EXPECTANCY   <- "Increase in Life Expectancy"
+INCREASE_LIFE_EXPECTANCY <- "Increase in Life Expectancy"
 POPULATION_DENSITY_PEOPLE_KM2 <- "Population Density (People/KM2)"
 YEAR <- "Year"
 
@@ -43,7 +43,7 @@ gapminder_clean <- gapminder_clean %>%
     year = Year,
     agriculture.value.added.of.gdp = Agriculture..value.added....of.GDP.,
     co2.emissions.metric.tons.per.capita = CO2.emissions..metric.tons.per.capita.,
-    domestic.credit.provided.by.financial.sector.of.gdp = 
+    domestic.credit.provided.by.financial.sector.of.gdp =
       Domestic.credit.provided.by.financial.sector....of.GDP.,
     electric.power.consumption.kWh.per.capita = Electric.power.consumption..kWh.per.capita.,
     energy.use.kg.of.oil.equivalent.per.capita = Energy.use..kg.of.oil.equivalent.per.capita.,
@@ -62,25 +62,26 @@ gapminder_clean <- gapminder_clean %>%
 gapminder_1962 <- gapminder_clean %>%
   filter((year == 1962))
 
-# Outlier: Make a scatter plot comparing 'CO2 emissions (metric tons per capita)' and gdpPercap 
+# Outlier: Make a scatter plot comparing 'CO2 emissions (metric tons per capita)' and gdpPercap
 # for the filtered data
 gapminder_1962_complete_cases <- gapminder_1962 %>%
   filter(!(is.na(co2.emissions.metric.tons.per.capita) | is.na(gdpPercap)))
 
 ggplotly(
   ggplot(
-  gapminder_1962_complete_cases,
-  aes(
-    x = gdpPercap,
-    y = co2.emissions.metric.tons.per.capita
-  )
-) +
-  geom_point() +
-  scale_x_log10() +
-  labs(
-    x = GDP_PER_CAPITA,
-    y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
-  ))
+    gapminder_1962_complete_cases,
+    aes(
+      x = gdpPercap,
+      y = co2.emissions.metric.tons.per.capita
+    )
+  ) +
+    geom_point() +
+    scale_x_log10() +
+    labs(
+      x = GDP_PER_CAPITA,
+      y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
+    )
+)
 
 # Calculate the correlation of 'CO2 emissions (metric tons per capita)' and gdpPercap
 correlation_outlier <- cor.test(
@@ -88,25 +89,26 @@ correlation_outlier <- cor.test(
   gapminder_1962_complete_cases$gdpPercap
 )
 
-# No outlier: Make a scatter plot comparing 'CO2 emissions (metric tons per capita)' 
+# No outlier: Make a scatter plot comparing 'CO2 emissions (metric tons per capita)'
 # and gdpPercap for the filtered data
 gapminder_1962_complete_cases_no_outlier <- gapminder_1962 %>%
   filter(!(is.na(co2.emissions.metric.tons.per.capita) | is.na(gdpPercap)) & (gdpPercap < 25000))
 
 ggplotly(
   ggplot(
-  gapminder_1962_complete_cases_no_outlier,
-  aes(
-    x = gdpPercap,
-    y = co2.emissions.metric.tons.per.capita
-  )
-) +
-  geom_point() +
-  scale_x_log10() +
-  labs(
-    x = GDP_PER_CAPITA,
-    y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
-  ))
+    gapminder_1962_complete_cases_no_outlier,
+    aes(
+      x = gdpPercap,
+      y = co2.emissions.metric.tons.per.capita
+    )
+  ) +
+    geom_point() +
+    scale_x_log10() +
+    labs(
+      x = GDP_PER_CAPITA,
+      y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
+    )
+)
 
 # Calculate the correlation of 'CO2 emissions (metric tons per capita)' and gdpPercap
 correlation_no_outlier <- cor.test(
@@ -114,7 +116,7 @@ correlation_no_outlier <- cor.test(
   gapminder_1962_complete_cases_no_outlier$gdpPercap
 )
 
-# On the unfiltered data, answer "In what year is the correlation between 'CO2 emissions 
+# On the unfiltered data, answer "In what year is the correlation between 'CO2 emissions
 # (metric tons per capita)' and gdpPercap the strongest"?
 gapminder_clean_by_year <- gapminder_clean %>%
   select(year, co2.emissions.metric.tons.per.capita, gdpPercap, pop, continent)
@@ -132,8 +134,8 @@ strongest_correlation_by_year <- (correlation_by_year %>%
 gapminder_strongest_correlation <- gapminder_clean %>%
   filter(year == strongest_correlation_by_year)
 
-# Using plotly, create an interactive scatter plot comparing 'CO2 emissions (metric tons per capita)' 
-# and gdpPercap, where the point size is determined by pop (population) and the color is determined 
+# Using plotly, create an interactive scatter plot comparing 'CO2 emissions (metric tons per capita)'
+# and gdpPercap, where the point size is determined by pop (population) and the color is determined
 # by the continent
 ggplotly(ggplot(
   gapminder_strongest_correlation,
@@ -153,93 +155,99 @@ ggplotly(ggplot(
 
 
 # #### PART 2 ####
-# What is the relationship between continent and 'Energy use (kg of oil equivalent per capita)'? 
+# What is the relationship between continent and 'Energy use (kg of oil equivalent per capita)'?
 # (stats test needed)
 gapminder_clean_continent_energy <- gapminder_clean %>%
   select(year, continent, energy.use.kg.of.oil.equivalent.per.capita) %>%
   filter(continent != "")
 
-gapminder_clean_continent_energy <- 
+gapminder_clean_continent_energy <-
   gapminder_clean_continent_energy[complete.cases(gapminder_clean_continent_energy), ]
 
 gapminder_clean_continent_energy$continent <- as.factor(gapminder_clean_continent_energy$continent)
 
 ggplotly(
   ggplot(
-  gapminder_clean_continent_energy,
-  aes(
-    x = continent,
-    y = energy.use.kg.of.oil.equivalent.per.capita
-  )
-) +
-  geom_point() +
-  labs(
-    x = CONTINENT,
-    y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
-  ))
+    gapminder_clean_continent_energy,
+    aes(
+      x = continent,
+      y = energy.use.kg.of.oil.equivalent.per.capita
+    )
+  ) +
+    geom_point() +
+    labs(
+      x = CONTINENT,
+      y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
+    )
+)
 
 ggplotly(
   ggplot(gapminder_clean_continent_energy) +
-  geom_boxplot(aes(
-    continent,
-    energy.use.kg.of.oil.equivalent.per.capita
-  )) +
-  labs(
-    x = CONTINENT,
-    y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
-  ))
+    geom_boxplot(aes(
+      continent,
+      energy.use.kg.of.oil.equivalent.per.capita
+    )) +
+    labs(
+      x = CONTINENT,
+      y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
+    )
+)
 
 # If your categorical variable is not dichotomous, you can use the Kruskal-Wallis test
 levels(gapminder_clean_continent_energy$continent)
-kruskal.test(gapminder_clean_continent_energy$continent ~ 
-             gapminder_clean_continent_energy$energy.use.kg.of.oil.equivalent.per.capita)
+kruskal.test(gapminder_clean_continent_energy$continent ~
+  gapminder_clean_continent_energy$energy.use.kg.of.oil.equivalent.per.capita)
 
-# Is there a significant difference between Europe and Asia with respect to 'Imports of goods 
+# Is there a significant difference between Europe and Asia with respect to 'Imports of goods
 # and services (% of GDP)' in the years after 1990? (stats test needed)
 gapminder_clean_europe_asia_1990 <- gapminder_clean %>%
   select(year, continent, imports.of.goods.and.services.of.gdp) %>%
   filter((year >= 1990) & ((continent == "Europe") | (continent == "Asia")))
 
-gapminder_clean_europe_asia_1990 <- 
+gapminder_clean_europe_asia_1990 <-
   gapminder_clean_europe_asia_1990[complete.cases((gapminder_clean_europe_asia_1990)), ]
 
 ggplotly(
   ggplot(
-  gapminder_clean_europe_asia_1990,
-  aes(
-    x = continent,
-    y = imports.of.goods.and.services.of.gdp
-  )
-) +
-  geom_point() +
-  labs(
-    x = CONTINENT,
-    y = IMPORTS_GOODS_SERVICES_GDP
-  ))
+    gapminder_clean_europe_asia_1990,
+    aes(
+      x = continent,
+      y = imports.of.goods.and.services.of.gdp
+    )
+  ) +
+    geom_point() +
+    labs(
+      x = CONTINENT,
+      y = IMPORTS_GOODS_SERVICES_GDP
+    )
+)
 
 ggplotly(
   ggplot(gapminder_clean_europe_asia_1990) +
-  geom_boxplot(aes(
-    continent,
-    imports.of.goods.and.services.of.gdp
-  )) +
-  labs(
-    x = CONTINENT,
-    y = IMPORTS_GOODS_SERVICES_GDP
-  ))
+    geom_boxplot(aes(
+      continent,
+      imports.of.goods.and.services.of.gdp
+    )) +
+    labs(
+      x = CONTINENT,
+      y = IMPORTS_GOODS_SERVICES_GDP
+    )
+)
 
 gapminder_clean_europe_asia_1990$continent <- as.factor(gapminder_clean_europe_asia_1990$continent)
 levels(gapminder_clean_europe_asia_1990$continent)
 
 wilcox.test(
   gapminder_clean_europe_asia_1990$imports.of.goods.and.services.of.gdp[
-    which(gapminder_clean_europe_asia_1990$continent == "Asia")],
+    which(gapminder_clean_europe_asia_1990$continent == "Asia")
+  ],
   gapminder_clean_europe_asia_1990$imports.of.goods.and.services.of.gdp[
-    which(gapminder_clean_europe_asia_1990$continent == "Europe")]
+    which(gapminder_clean_europe_asia_1990$continent == "Europe")
+  ]
 )
 
-# What is the country (or countries) that has the highest 'Population density (people per sq. km 
-# of land area)' across all years? (i.e., which country has the highest average ranking in this 
+# What is the country (or countries) that has the highest 'Population density (people per sq. km
+# of land area)' across all years? (i.e., which country has the highest average ranking in this
 # category across each time point in the dataset?)
 highest_pop_density <- gapminder_clean %>%
   select(year, country.name, population.density.people.per.sq.km.of.land.area)
@@ -276,7 +284,7 @@ y <- y %>%
   group_by(year) %>%
   summarise(pop_density = max(population.density.people.per.sq.km.of.land.area))
 
-# What country (or countries) has shown the greatest increase in 'Life expectancy at birth, total (years)' 
+# What country (or countries) has shown the greatest increase in 'Life expectancy at birth, total (years)'
 # since 1962?
 increase_life_expectancy <- gapminder_clean %>%
   select(year, country.name, life.expectancy.at.birth.total.years)
