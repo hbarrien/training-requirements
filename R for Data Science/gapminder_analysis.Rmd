@@ -51,7 +51,7 @@ The exercises presented herein were applied to the *gapminder_clean.csv* dataset
 
 ## Data Processing
 ```{r setup, include=FALSE} 
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 ### Part 1: Use tidyverse functions to analyze the _gapminder_clean_ dataset   
 Step 1.1. Load libraries and define constants used throughout the process
@@ -61,18 +61,17 @@ library(ggplot2)
 library(plotly)
 
 # ######### CONSTANTS #########
-FILE_PATH <- 
-  "D:/DE/projects/R/wd/Bioinformatics/Bioinformatics Research Network/02 R for Data Science/gapminder_clean.csv"
+FILE_PATH <- paste0(getwd(), "/gapminder_clean.csv")
 
 # Plot titles
 CO2_EMISSIONS <- "CO2 Emissions (Metric Tons per Capita)"
 CONTINENT <- "Continent"
-COUNTRY   <- "Country"
+COUNTRY <- "Country"
 ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA <- "Energy Use - KG of Oil Equivalent per Capita"
 GDP_PER_CAPITA <- "GDP per Capita"
 CO2_EMMISIONS_METRIC_TONS_PER_CAPITA <- "CO2 Emmisions - Metric Tons per Capita"
 IMPORTS_GOODS_SERVICES_GDP <- "Imports of Goods and Services of GDP"
-INCREASE_LIFE_EXPECTANCY   <- "Increase in Life Expectancy"
+INCREASE_LIFE_EXPECTANCY <- "Increase in Life Expectancy"
 POPULATION_DENSITY_PEOPLE_KM2 <- "Population Density (People/KM2)"
 YEAR <- "Year"
 ```
@@ -82,6 +81,8 @@ Step 1.2. Read the data file and clean up its columns:
 * Remove the X column (row numbers)
 * Make the rest of the column names more readable
 ```{r}
+set.seed(1234)
+
 gapminder_clean <- read.csv(FILE_PATH)
 
 gapminder_clean$X <- NULL
@@ -92,7 +93,7 @@ gapminder_clean <- gapminder_clean %>%
     year = Year,
     agriculture.value.added.of.gdp = Agriculture..value.added....of.GDP.,
     co2.emissions.metric.tons.per.capita = CO2.emissions..metric.tons.per.capita.,
-    domestic.credit.provided.by.financial.sector.of.gdp = 
+    domestic.credit.provided.by.financial.sector.of.gdp =
       Domestic.credit.provided.by.financial.sector....of.GDP.,
     electric.power.consumption.kWh.per.capita = Electric.power.consumption..kWh.per.capita.,
     energy.use.kg.of.oil.equivalent.per.capita = Energy.use..kg.of.oil.equivalent.per.capita.,
@@ -121,18 +122,19 @@ Step 1.4. Make a scatter plot comparing 'CO2 emissions (metric tons per capita)'
 ```{r}
 ggplotly(
   ggplot(
-  gapminder_1962_complete_cases,
-  aes(
-    x = gdpPercap,
-    y = co2.emissions.metric.tons.per.capita
-  )
-) +
-  geom_point() +
-  scale_x_log10() +
-  labs(
-    x = GDP_PER_CAPITA,
-    y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
-  ))
+    gapminder_1962_complete_cases,
+    aes(
+      x = gdpPercap,
+      y = co2.emissions.metric.tons.per.capita
+    )
+  ) +
+    geom_point() +
+    scale_x_log10() +
+    labs(
+      x = GDP_PER_CAPITA,
+      y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
+    )
+)
 ```
 <BR>
 Step 1.5. Calculate the correlation of 'CO2 emissions (metric tons per capita)' and gdpPercap. Including the discovered outlier, the result shows a high degree of correlation: ~ 93%. Although the outlier tends to show an increasing linear pattern, there is a considerable distance between it and the rest of the data points. This gap makes it difficult to conclude that there is indeed an increasing linear pattern
@@ -152,18 +154,19 @@ gapminder_1962_complete_cases_no_outlier <- gapminder_1962 %>%
 
 ggplotly(
   ggplot(
-  gapminder_1962_complete_cases_no_outlier,
-  aes(
-    x = gdpPercap,
-    y = co2.emissions.metric.tons.per.capita
-  )
-) +
-  geom_point() +
-  scale_x_log10() +
-  labs(
-    x = GDP_PER_CAPITA,
-    y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
-  ))
+    gapminder_1962_complete_cases_no_outlier,
+    aes(
+      x = gdpPercap,
+      y = co2.emissions.metric.tons.per.capita
+    )
+  ) +
+    geom_point() +
+    scale_x_log10() +
+    labs(
+      x = GDP_PER_CAPITA,
+      y = CO2_EMMISIONS_METRIC_TONS_PER_CAPITA
+    )
+)
 
 correlation_no_outlier <- cor.test(
   gapminder_1962_complete_cases_no_outlier$co2.emissions.metric.tons.per.capita,
@@ -228,7 +231,7 @@ gapminder_clean_continent_energy <- gapminder_clean %>%
   select(year, continent, energy.use.kg.of.oil.equivalent.per.capita) %>%
   filter(continent != "")
 
-gapminder_clean_continent_energy <- 
+gapminder_clean_continent_energy <-
   gapminder_clean_continent_energy[complete.cases(gapminder_clean_continent_energy), ]
 
 gapminder_clean_continent_energy$continent <- as.factor(gapminder_clean_continent_energy$continent)
@@ -237,36 +240,38 @@ gapminder_clean_continent_energy$continent <- as.factor(gapminder_clean_continen
 ```{r}
 ggplotly(
   ggplot(
-  gapminder_clean_continent_energy,
-  aes(
-    x = continent,
-    y = energy.use.kg.of.oil.equivalent.per.capita
-  )
-) +
-  geom_point() +
-  labs(
-    x = CONTINENT,
-    y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
-  ))
+    gapminder_clean_continent_energy,
+    aes(
+      x = continent,
+      y = energy.use.kg.of.oil.equivalent.per.capita
+    )
+  ) +
+    geom_point() +
+    labs(
+      x = CONTINENT,
+      y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
+    )
+)
 ```
 
 ```{r}
 ggplotly(
   ggplot(gapminder_clean_continent_energy) +
-  geom_boxplot(aes(
-    continent,
-    energy.use.kg.of.oil.equivalent.per.capita
-  )) +
-  labs(
-    x = CONTINENT,
-    y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
-  ))
+    geom_boxplot(aes(
+      continent,
+      energy.use.kg.of.oil.equivalent.per.capita
+    )) +
+    labs(
+      x = CONTINENT,
+      y = ENERGY_USE_KG_OIL_EQUIV_PER_CAPITA
+    )
+)
 ```
 
 ```{r}
 levels(gapminder_clean_continent_energy$continent)
-kruskal.test(gapminder_clean_continent_energy$continent ~ 
-             gapminder_clean_continent_energy$energy.use.kg.of.oil.equivalent.per.capita)
+kruskal.test(gapminder_clean_continent_energy$continent ~
+  gapminder_clean_continent_energy$energy.use.kg.of.oil.equivalent.per.capita)
 ```
 <BR>
 Step 2.2. Question: Is there a significant difference between Europe and Asia with respect to 'Imports of goods and services (% of GDP)' in the years after 1990? (stats test needed)   
@@ -280,37 +285,39 @@ gapminder_clean_europe_asia_1990 <- gapminder_clean %>%
   select(year, continent, imports.of.goods.and.services.of.gdp) %>%
   filter((year >= 1990) & ((continent == "Europe") | (continent == "Asia")))
 
-gapminder_clean_europe_asia_1990 <- 
+gapminder_clean_europe_asia_1990 <-
   gapminder_clean_europe_asia_1990[complete.cases((gapminder_clean_europe_asia_1990)), ]
 ```
 
 ```{r}
 ggplotly(
   ggplot(
-  gapminder_clean_europe_asia_1990,
-  aes(
-    x = continent,
-    y = imports.of.goods.and.services.of.gdp
-  )
-) +
-  geom_point() +
-  labs(
-    x = CONTINENT,
-    y = IMPORTS_GOODS_SERVICES_GDP
-  ))
+    gapminder_clean_europe_asia_1990,
+    aes(
+      x = continent,
+      y = imports.of.goods.and.services.of.gdp
+    )
+  ) +
+    geom_point() +
+    labs(
+      x = CONTINENT,
+      y = IMPORTS_GOODS_SERVICES_GDP
+    )
+)
 ```
 
 ```{r}
 ggplotly(
   ggplot(gapminder_clean_europe_asia_1990) +
-  geom_boxplot(aes(
-    continent,
-    imports.of.goods.and.services.of.gdp
-  )) +
-  labs(
-    x = CONTINENT,
-    y = IMPORTS_GOODS_SERVICES_GDP
-  ))
+    geom_boxplot(aes(
+      continent,
+      imports.of.goods.and.services.of.gdp
+    )) +
+    labs(
+      x = CONTINENT,
+      y = IMPORTS_GOODS_SERVICES_GDP
+    )
+)
 ```
 
 ```{r}
@@ -319,9 +326,11 @@ levels(gapminder_clean_europe_asia_1990$continent)
 
 wilcox.test(
   gapminder_clean_europe_asia_1990$imports.of.goods.and.services.of.gdp[
-    which(gapminder_clean_europe_asia_1990$continent == "Asia")],
+    which(gapminder_clean_europe_asia_1990$continent == "Asia")
+  ],
   gapminder_clean_europe_asia_1990$imports.of.goods.and.services.of.gdp[
-    which(gapminder_clean_europe_asia_1990$continent == "Europe")]
+    which(gapminder_clean_europe_asia_1990$continent == "Europe")
+  ]
 )
 ```
 <BR>

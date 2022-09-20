@@ -9,8 +9,7 @@ library(plotly)
 # #############################
 # ######### CONSTANTS #########
 # #############################
-FILE_PATH <- 
-  "D:/DE/projects/R/wd/Bioinformatics/Bioinformatics Research Network/02 R for Data Science/gapminder_clean.csv"
+FILE_PATH <- paste0(getwd(), "/gapminder_clean.csv")
 
 # Plot titles
 CO2_EMISSIONS <- "CO2 Emissions (Metric Tons per Capita)"
@@ -30,6 +29,8 @@ YEAR <- "Year"
 # #############################
 
 # #### PART 1 ####
+set.seed(1234)
+
 # Read data file
 gapminder_clean <- read.csv(FILE_PATH)
 
